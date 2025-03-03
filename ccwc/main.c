@@ -93,27 +93,32 @@ int main(int argc, char** argv){
     /*     return EXIT_FAILURE; */
     /* } */
     
-    struct flags { int opt; int64_t words, lines, chars, bytes; };
+    struct flags { int opt; 
+        bool wflag, lflag, mflag, cflag, default_flag; 
+        FileSpecs specs;
+    };
 
-    struct flags f;
+    struct flags f = {
+        .default_flag = true
+    };
 
     while ((f.opt = getopt(argc, argv, ":w:l:m:c:"))) {
         switch (f.opt) {
             case 'w':
-                f.words = wordCount(optarg).words;
-                printf("%ld %s\n",f.words,optarg);
+                f.wflag = true;
+                f.default_flag = false;
                 break;
             case 'l':
-                f.lines = wordCount(optarg).lines;
-                printf("%ld %s\n",f.lines,optarg);
+                f.lflag = true;
+                f.default_flag = false;
                 break;
             case 'm':
-                f.chars = wordCount(optarg).chars;
-                printf("%ld %s\n",f.chars,optarg);
+                f.mflag = true;
+                f.default_flag = false;
                 break;
             case 'c':
-                f.bytes = wordCount(optarg).bytes;
-                printf("%ld %s\n",f.bytes,optarg);
+                f.cflag = true;
+                f.default_flag = false;
                 break;
             case '?':
                 if (optopt == 'w' || optopt == 'l' || optopt == 'm' || optopt == 'c' )
@@ -121,18 +126,22 @@ int main(int argc, char** argv){
                 else
                  fprintf(stderr, "Opción desconocida -%c\n", optopt);
                 return 1;
-            default:
-                fprintf(stderr,"USO: %s [-w fichero] [-c fichero] [-l fichero] [-b fichero] [fichero]\n", argv[0]);
-                return 1;
         }
     }
-    for (int i = optind; i < argc; i++){
-            f.words = wordCount(argv[i]).words;
-            f.lines = wordCount(argv[i]).lines;
-            f.bytes = wordCount(argv[i]).bytes;
-            printf("%ld %ld %ld %s", f.lines, f.words, f.bytes, argv[i]);
+    for (int i = optind; i < argc; i++) {
+        f.specs = wordCount(optarg);    
+        // Si no se especificó ninguna opción, mostrar todo (acción por defecto)
+        if (f.default_flag) {
+            printf("%ld %ld %ld %ld %s\n", f.specs.lines, f.specs.words, f.specs.chars, f.specs.bytes, argv[i]);
+        } else {
+            // Mostrar solo las estadísticas solicitadas
+            if (f.lflag) printf("%ld ", f.specs.lines);
+            if (f.wflag) printf("%ld ", f.specs.words);
+            if (f.mflag) printf("%ld ", f.specs.chars);
+            if (f.cflag) printf("%ld ", f.specs.bytes);
+            printf("%s\n", argv[i]);
+        }
     }
-
     return 0;
 
 }
