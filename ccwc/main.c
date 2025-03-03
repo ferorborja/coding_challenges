@@ -102,7 +102,7 @@ int main(int argc, char** argv){
         .default_flag = true
     };
 
-    while ((f.opt = getopt(argc, argv, ":w:l:m:c:"))) {
+    while ((f.opt = getopt(argc, argv, "wlmc")) != 1) {
         switch (f.opt) {
             case 'w':
                 f.wflag = true;
@@ -129,7 +129,7 @@ int main(int argc, char** argv){
         }
     }
     for (int i = optind; i < argc; i++) {
-        f.specs = wordCount(optarg);    
+        f.specs = wordCount(argv[i]);    
         // Si no se especificó ninguna opción, mostrar todo (acción por defecto)
         if (f.default_flag) {
             printf("%ld %ld %ld %ld %s\n", f.specs.lines, f.specs.words, f.specs.chars, f.specs.bytes, argv[i]);
