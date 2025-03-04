@@ -69,7 +69,9 @@ FileSpecs wordCount(char* filename){
 int main(int argc, char** argv){
 
     setlocale(LC_ALL, "");
-    
+
+    // Podrían ser variables individuales pero
+    // lo meto todo en un struct hell yeah
     struct flags { int opt; 
         bool wflag, lflag, mflag, cflag, default_flag; 
         FileSpecs specs;
@@ -107,7 +109,6 @@ int main(int argc, char** argv){
     }
     for (int i = optind; i < argc; i++) {
         f.specs = wordCount(argv[i]);    
-        // Si no se especificó ninguna opción, mostrar todo (acción por defecto)
         if (f.default_flag) {
             printf("%ld %ld %ld %s\n", f.specs.lines, f.specs.words, f.specs.bytes, argv[i]);
         } else {
