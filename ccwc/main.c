@@ -22,7 +22,14 @@ FileSpecs wordCount(char* filename){
 
     FileSpecs fileSpecs = { .bytes = 0 , .lines = 0 , .words = 0 , .chars = 0 };
 
-    FILE* file = fopen(filename, "r");
+    if (filename){
+        FILE* file = fopen(filename, "r");
+    }else if (filename == NULL) {
+        FILE* file = stdin;
+    } else {
+        printf("ERROR: No filename specified\n");
+        exit(EXIT_FAILURE);
+    }
 
     if(!file){
         printf("ERROR: Can't open file!\n");
