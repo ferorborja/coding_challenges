@@ -69,29 +69,6 @@ FileSpecs wordCount(char* filename){
 int main(int argc, char** argv){
 
     setlocale(LC_ALL, "");
-
-    /* if (argc != 3 ){ */
-    /*     fprintf(stderr, "ERROR: Use --help to show usage.\n"); */ 
-    /*     return EXIT_FAILURE; */
-    /* } */
-
-
-    /* if(strcmp("-c", argv[1]) == 0){ */
-    /*     int64_t numberBytes= wordCount(argv[2]).bytes; */
-    /*     printf("%ld %s\n",numberBytes,argv[2]); */
-    /* } else if (strcmp("-l", argv[1]) == 0) { */
-    /*     int64_t numberLines = wordCount(argv[2]).lines; */
-    /*     printf("%ld %s\n",numberLines,argv[2]); */
-    /* } else if (strcmp("-w", argv[1]) == 0) { */
-    /*     int64_t numberWords = wordCount(argv[2]).words; */
-    /*     printf("%ld %s\n",numberWords,argv[2]); */
-    /* } else if (strcmp("-m", argv[1]) == 0) { */
-    /*     int64_t numberChars = wordCount(argv[2]).chars; */
-    /*     printf("%ld %s\n",numberChars,argv[2]); */
-    /* } else { */
-    /*     printf("Only -c implemented by the moment\n"); */
-    /*     return EXIT_FAILURE; */
-    /* } */
     
     struct flags { int opt; 
         bool wflag, lflag, mflag, cflag, default_flag; 
