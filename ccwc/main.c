@@ -16,24 +16,27 @@ typedef struct {
     int64_t bytes, lines, words, chars;
 } FileSpecs; 
 
+// Podrían ser variables individuales pero
+// lo meto todo en un struct hell yeah
+struct flags { int opt; 
+    bool wflag, lflag, mflag, cflag, default_flag; 
+    FileSpecs specs;
+};
+
 FileSpecs wordCount(char* filename){
 
     setlocale(LC_ALL, "");
 
     FileSpecs fileSpecs = { .bytes = 0 , .lines = 0 , .words = 0 , .chars = 0 };
-
-    if (filename){
-        FILE* file = fopen(filename, "r");
-    }else if (filename == NULL) {
-        FILE* file = stdin;
-    } else {
-        printf("ERROR: No filename specified\n");
-        exit(EXIT_FAILURE);
-    }
-
-    if(!file){
-        printf("ERROR: Can't open file!\n");
-        exit(EXIT_FAILURE);
+    FILE* file;
+    if (filename == NULL){
+        file = stdin;
+    }else if (filename) {
+        file = fopen(filename, "r");
+        if(!file){
+            printf("ERROR: Can't open file!\n");
+            exit(EXIT_FAILURE);
+        }
     }
 
     // Inicializamos buffer y contador de espacio previo
@@ -67,22 +70,29 @@ FileSpecs wordCount(char* filename){
                              // el bucle.
     }
     
-    fclose(file);
+    if(file != stdin) fclose(file);
 
     return fileSpecs;
 
 }
 
+void printWc(struct flags *args, char* filename){
+    if(filename == NULL) filename = "";
+    if (args->default_flag) {
+        printf("%ld %ld %ld %s\n", args->specs.lines, args->specs.words, args->specs.bytes, filename);
+    } else {
+        // Mostrar solo las estadísticas solicitadas
+        if (args->lflag) printf("%ld ", args->specs.lines);
+        if (args->wflag) printf("%ld ", args->specs.words);
+        if (args->mflag) printf("%ld ", args->specs.chars);
+        if (args->cflag) printf("%ld ", args->specs.bytes);
+        printf("%s\n", filename);
+    }
+}
+
 int main(int argc, char** argv){
 
     setlocale(LC_ALL, "");
-
-    // Podrían ser variables individuales pero
-    // lo meto todo en un struct hell yeah
-    struct flags { int opt; 
-        bool wflag, lflag, mflag, cflag, default_flag; 
-        FileSpecs specs;
-    };
 
     struct flags f = {
         .default_flag = true
@@ -114,17 +124,18 @@ int main(int argc, char** argv){
                 return 1;
         }
     }
-    for (int i = optind; i < argc; i++) {
-        f.specs = wordCount(argv[i]);    
-        if (f.default_flag) {
-            printf("%ld %ld %ld %s\n", f.specs.lines, f.specs.words, f.specs.bytes, argv[i]);
-        } else {
-            // Mostrar solo las estadísticas solicitadas
-            if (f.lflag) printf("%ld ", f.specs.lines);
-            if (f.wflag) printf("%ld ", f.specs.words);
-            if (f.mflag) printf("%ld ", f.specs.chars);
-            if (f.cflag) printf("%ld ", f.specs.bytes);
-            printf("%s\n", argv[i]);
+    if(optind == argc){
+        if(isatty(STDIN_FILENO)){
+            fprintf(stderr,"USO: Proporciona un archivo o entrada por stdin");
+            return EXIT_FAILURE;
+        }
+        f.specs = wordCount(NULL);
+        printWc(&f,NULL);
+        return 0;
+    } else {
+        for (int i = optind; i < argc; i++) {
+            f.specs = wordCount(argv[i]);    
+            printWc(&f, argv[i]);
         }
     }
     return 0;
